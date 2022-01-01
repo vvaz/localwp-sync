@@ -1,5 +1,8 @@
 variables.dat
 
+public/
+backups/
+
 # ignore log files and databases
 *.log
 *.sql
