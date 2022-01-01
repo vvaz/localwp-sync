@@ -2,12 +2,6 @@
 
 # make sure you have created an SSH key and added it to runcloud and github
 
-# START EDITING variables
-siteName=wpbox
-usernameRuncloud=devwpbox
-ipRuncloud=85.90.246.59
-# host = $usernameRuncloud + "@" + $ipRunclund
-
 
 
 # STOP EDITING
