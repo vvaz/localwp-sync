@@ -1,6 +1,11 @@
 #!/bin/bash
 
 WPPath=--path=public/
+
+mysqlFile=mysql.sql
+current_time=$(date "+%Y.%m.%d-%H.%M.%S")
+mysqlFileTime=$current_time.$mysqlFile
+
 # read variables from the .dat file
 while read line; do    
     declare $line
@@ -31,10 +36,11 @@ wp user create dev dev@wpbox.io --role=administrator --user_pass=dev  $WPPath
 echo "Created user: dev / pass: dev"
 
 echo "backing up mysql"
-cp public/mysql.sql backups/db/mysql.sql
-echo "Clearing"
-rm public/mysql.sql
-echo "removed mysql.sql from LOCAL"
+mv public/$mysqlFile public/$mysqlFileTime
+mv public/$mysqlFileTime backups/db/$mysqlFileTime
+gzip backups/db/$mysqlFileTime
+echo "Stored a database backup in backups/db/"
+echo "Clean up FINISHED"
 
 echo "All done"
 exit 0
