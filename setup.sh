@@ -8,12 +8,18 @@ mkdir backups && mkdir backups/db/ && mkdir backups/files/
 echo "DONE"
 
 # getting variables
+echo "=================================="
+echo "==            LOCAL             =="
+echo "=================================="
 echo "What is your site name on LOCAL?"
 read siteName
 echo "siteName=$siteName" > variables.dat
 echo "What is your db port on LOCAL"
 read dbport
 echo "dbport=$dbport" >> variables.dat
+echo "=================================="
+echo "==            LIVE              =="
+echo "=================================="
 echo "What is the IP of the LIVE server?"
 read ipRuncloud
 echo "ipRuncloud=$ipRuncloud" >> variables.dat
@@ -23,6 +29,9 @@ echo "usernameRuncloud=$usernameRuncloud" >> variables.dat
 echo "What is your app-name on RunCloud?"
 read runcloudAppName
 echo "runcloudAppName=$runcloudAppName" >> variables.dat
+echo "What is your Runcloud domain"
+read runcloudDomain
+echo "runcloudDomain=$runcloudDomain" >> variables.dat
 
 # clearing public and adding a Git repo
 rm -rf public
