@@ -27,3 +27,5 @@ Copy the webhook URL to your Github repository
 # Step 7
 Create a new database and username for your new app
 
+# Step 8
+Run setup.sh
