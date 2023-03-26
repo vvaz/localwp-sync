@@ -29,8 +29,9 @@ echo "Importing on LOCAL"
 wp db import public/mysql.sql $WPPath
 # Search & Replace the site url
 echo "Fixing site url"
-wp search-replace https://$runcloudDomain http://$siteName.local $WPPath
-wp search-replace http://$runcloudDomain http://$siteName.local $WPPath
+wp search-replace https://$runcloudDomain http://localhost:10043 $WPPath
+wp search-replace http://$runcloudDomain http://localhost:10043 $WPPath
+wp search-replace http://$runcloudDomain http://localhost:10043 $WPPath
 echo "Adding dev user"
 wp user create dev dev@wpbox.io --role=administrator --user_pass=dev  $WPPath
 echo "Created user: dev / pass: dev"
