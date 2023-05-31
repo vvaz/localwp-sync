@@ -1,10 +1,26 @@
 # Intro
 
-This workflow will setup a new site on LOCAL based on a Github repository for local development.
-
+This workflow will setup a new site on DDEV based on a Github repository for local development.
 It will also let you sync any production files to your local environment.
+It connects to your site on Runcloud with your DDEV. It should work on Mac OS and Windows WSL2 with Ubuntu
 
-It connects your site on Runcloud with your Local by Flywheel.
+# 1. Setup DDEV and project structures
+> We're assuming you already have DDEV installed and running on your OS.
+
+Go into your project path and clone this repository into a folder called **ops**
+```
+git clone git@github.com:vvaz/localwp-sync.git ops
+```
+Create a folder called public which will have our repository
+```
+mkdir public
+```
+Run ddev config and follow the prompts
+```
+ddev config
+```
+
+
 
 # Step 1
 Create your Github repository and add WordPress core to it, ignore wp-config.php and node_modules
