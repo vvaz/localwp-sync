@@ -1,15 +1,15 @@
 #!/bin/bash
 
-WPPath=--path=../public/
+WPPath=--path=public/
 
   # clearing public and adding a Git repo
-  mv ../public ../public-old
-  mkdir ../public
+  mv public public-old
+  mkdir public
 
 if ! [ -d "../backups" ]; then
   # create backup folders
   echo "Creating backup folders"
-  mkdir ../backups && mkdir ../backups/db/ && mkdir ../backups/files/
+  mkdir backups && mkdir backups/db/ && mkdir backups/files/
   echo "DONE"
 fi
 
@@ -52,17 +52,18 @@ fi
   done < variables.dat
 
 echo "Cloning the repository..."
-git clone $gitRepo ../public
+git clone $gitRepo public
 echo "Done!"
 
 # move wp-config.php to root
 echo "creating wp-config from DDEV..."
-mv ../public-old/wp-config.php ../public/wp-config.php
-mv ../public-old/wp-config-ddev.php ../public/wp-config-ddev.php
+mv public-old/wp-config.php public/wp-config.php
+mv public-old/wp-config-ddev.php public/wp-config-ddev.php
 echo "Done!"
 
 # clear public-old
-rm -rf ../public-old
+echo "Clear public-old..."
+rm -rf public-old
 echo "Done!"
 
 exit 0
