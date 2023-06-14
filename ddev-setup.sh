@@ -1,18 +1,49 @@
 #!/bin/bash
 
 WPPath=--path=public/
+current_folder=$(basename "$PWD")
 
-  # clearing public and adding a Git repo
+# check if there is a public-old folder
+if ! [ -d "public-old" ]; then
   mv public public-old
   mkdir public
+fi
 
-if ! [ -d "../backups" ]; then
-  # create backup folders
+# create backup folders
+if ! [ -d "backups" ]; then
   echo "Creating backup folders"
   mkdir backups && mkdir backups/db/ && mkdir backups/files/
   echo "DONE"
 fi
 
+ddevSetup () {
+  # ddev setup
+  echo "Setting up DDEV..."
+  ddev config --project-name=$current_folder --docroot=public --create-docroot --project-type=wordpress --php-version=7.4
+  echo "Done!"
+}
+
+# check if there is a .ddev folder
+if ! [ -d ".ddev" ]; then
+  echo "No .ddev folder found, setting up DDEV..."
+  ddevSetup
+fi
+
+# Prompt the user for questions and store answers in variables
+read -p "Enter your name: " name
+read -p "Enter your age: " age
+read -p "Enter your favorite color: " color
+
+# Create a conf YAML file
+cat <<EOF >conf.yaml
+name: $name
+age: $age
+color: $color
+EOF
+
+
+
+<<datfile
 if ! [ -e "variables.dat" ]; then
   echo "variables.dat file not found, creating one..."
   # getting variables
@@ -44,13 +75,17 @@ if ! [ -e "variables.dat" ]; then
   read gitRepo
   echo "gitRepo=$gitRepo" >> variables.dat
 fi
+datfile
 
+<<datfile
 # read variables from the .dat file
   while read line; do
     declare $line
     echo $line
   done < variables.dat
+datfile
 
+<<test
 echo "Cloning the repository..."
 git clone $gitRepo public
 echo "Done!"
@@ -65,5 +100,8 @@ echo "Done!"
 echo "Clear public-old..."
 rm -rf public-old
 echo "Done!"
+test
+
+
 
 exit 0
