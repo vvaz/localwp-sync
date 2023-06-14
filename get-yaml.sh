@@ -23,10 +23,10 @@ check_existing_variables() {
 store_variables() {
   # Prompt the user for input
   options=(
-    " DEV - Development Server - Vultr\n"
-    " Low Traffic Websites - Vultr\n"
-    " Medium Sites - Vultr\n"
-    " Other - Enter IP\n"
+    " DEV - Development Server - Vultr"
+    " Low Traffic Websites - Vultr"
+    " Medium Sites - Vultr"
+    " Other - Enter IP"
   )
   PS3="Select an option (default: 1): "
 
@@ -68,8 +68,6 @@ store_variables() {
     read -p "What is the username? " username
     read -p "What is the app name? " app_name
     read -p "What is the git repository? " git_repository
-
-
 
     find_server_id_by_ip
     # Append the variables to the conf.yml file
