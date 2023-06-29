@@ -5,6 +5,12 @@ conf_file="conf.yml"
 API_KEY=$(grep "api_key:" "$conf_file" | awk '{print $2}')
 API_SECRET=$(grep "api_secret:" "$conf_file" | awk '{print $2}')
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    OS="m1"
+else
+    OS="w11"
+fi
+
 # Function to check if variables exist in the conf.yml file
 check_existing_variables() {
     existing_variables=$(grep -E "^(server|username|app_name|git_repository|server_id):" "$conf_file")
@@ -157,10 +163,15 @@ create_username() {
     )
 
     if [ $? -eq 0 ]; then
-        echo "Created the username $username on the server with ID $server_id."
-        echo "Password is $password"
+      user_id=$(echo "$response" | jq -r '.id')
+
+      # echo $response
+
+      echo "Created the username $username on the server with ID $server_id."
+      echo "Password is $password"
+      echo "user_id: $user_id" >> "$conf_file"  # Save the user ID in conf.yml
     else
-        echo "Failed to create the username $username on the server with ID $server_id."
+      echo "Failed to create the username $username on the server with ID $server_id."
     fi
 }
 
@@ -203,10 +214,8 @@ add_ssh_key() {
     ssh_key=$(cat ~/.ssh/id_ed25519.pub)
     server_id=$2
     username=$(grep "username:" "$conf_file" | awk '{print $2}')
-
-    echo $username
-    echo $ssh_key
-    echo $server_id
+    app_name=$(grep "app_name:" "$conf_file" | awk '{print $2}')
+    OSkey="$OS"-"ssh-key"-"$app_name"
 
     # Perform the logic to add the SSH key on the server
     response=$(curl -s -X POST \
@@ -214,7 +223,7 @@ add_ssh_key() {
         -H "accept: application/json" \
         -H "content-type: application/json" \
         --data '{
-            "label": "w11-ssh-key",
+            "label": "'"$OSkey"'",
             "username": "'"$username"'",
             "publicKey": "'"$ssh_key"'"
         }' \
@@ -228,6 +237,29 @@ add_ssh_key() {
     fi
 }
 
+
+generate_deployment_key() {
+  server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
+  user_id=$(grep "user_id:" "$conf_file" | awk '{print $2}')
+
+  echo "server_id: $server_id"
+  echo "user_id: $user_id"
+
+  # Perform the logic to generate the deployment key on the server
+  response=$(curl -s -X PATCH \
+        -u "$API_KEY:$API_SECRET" \
+        -H "accept: application/json" \
+        -H "content-type: application/json" \
+        "https://manage.runcloud.io/api/v2/servers/$server_id/users/$user_id/deploymentkey"
+    )
+
+    if [ $? -eq 0 ]; then
+        git_deployment_key=$(echo "$response" | jq -r ' .deploymentKey')
+        # echo "Git deployment key: $git_deployment_key"
+        echo "git_deployment_key: $git_deployment_key" >> "$conf_file"
+    fi
+}
+
 # Check if variables exist in conf.yml file
 if check_existing_variables; then
     # Variables exist, perform necessary operations
@@ -238,12 +270,13 @@ if check_existing_variables; then
     echo "variables found"
 
     # check_username_existence
-    #check_username_existence
-
-    # check if ssh key exists
+    check_username_existence
 
     # list ssh keys
     list_ssh_keys
+
+    # generate deployment key
+    generate_deployment_key
 
 else
     # Variables don't exist, store the variables
