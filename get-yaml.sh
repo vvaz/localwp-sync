@@ -72,12 +72,16 @@ esac
     read -p "What is the app name (either new or existing? " app_name
     read -p "What is the git repository? " git_repository
 
+    # Grab the SSH key from ~/.ssh/id_rsa.pub
+    ssh_key=$(cat ~/.ssh/id_ed25519.pub)
+
     find_server_id_by_ip
     # Append the variables to the conf.yml file
     echo "username: $username" >> "$conf_file"
     echo "app_name: $app_name" >> "$conf_file"
     echo "git_repository: $git_repository" >> "$conf_file"
     echo "server_id: $server_id" >> "$conf_file"
+    echo "ssh_key: $ssh_key" >> "$conf_file"
     echo "Variables stored in conf.yml file."
 }
 
@@ -130,13 +134,6 @@ check_username_existence() {
     fi
 }
 
-
-
-
-
-
-
-
 create_username() {
     local username=$1
     local server_id=$2
@@ -179,6 +176,9 @@ if check_existing_variables; then
 
     # check_username_existence
     check_username_existence
+
+    # check if ssh key exists
+
 
 else
     # Variables don't exist, store the variables
