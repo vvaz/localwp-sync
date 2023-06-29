@@ -164,6 +164,69 @@ create_username() {
     fi
 }
 
+list_ssh_keys () {
+    server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
+    # ssh_key=$(grep "ssh_key:" "$conf_file" | awk '{print $2}')
+    ssh_key=$(cat ~/.ssh/id_ed25519.pub)
+
+    response=$(curl -s --request GET \
+        -u "$API_KEY:$API_SECRET" \
+        -H "Accept: application/json" \
+        -H "Content-Type: application/json" \
+        "https://manage.runcloud.io/api/v2/servers/$server_id/sshcredentials"
+    )
+
+
+    if [ $? -eq 0 ]; then
+        echo "SSH keys on the server with ID $server_id:"
+        echo "$response" | jq -r '.data[] | .id'
+        echo "$response" | jq -r '.data[] | .user_id'
+        echo "$response" | jq -r '.data[] | .publickey'
+
+        # if .publickey is not equal to the ssh_key in conf.yml file, then add the ssh_key
+        # Check if the SSH key exists
+        key_exists=$(echo "$response" | jq -r --arg ssh_key "$ssh_key" '.data[] | select(.publickey == $ssh_key)')
+
+        if [ -n "$key_exists" ]; then
+            echo "The SSH key is already added on the server with ID $server_id."
+        else
+            echo "The SSH key is not added on the server with ID $server_id."
+            add_ssh_key "$ssh_key" "$server_id"
+        fi
+
+    else
+        echo "Failed to retrieve SSH keys from the Runcloud API."
+    fi
+}
+
+add_ssh_key() {
+    ssh_key=$(cat ~/.ssh/id_ed25519.pub)
+    server_id=$2
+    username=$(grep "username:" "$conf_file" | awk '{print $2}')
+
+    echo $username
+    echo $ssh_key
+    echo $server_id
+
+    # Perform the logic to add the SSH key on the server
+    response=$(curl -s -X POST \
+        -u "$API_KEY:$API_SECRET" \
+        -H "accept: application/json" \
+        -H "content-type: application/json" \
+        --data '{
+            "label": "w11-ssh-key",
+            "username": "'"$username"'",
+            "publicKey": "'"$ssh_key"'"
+        }' \
+       "https://manage.runcloud.io/api/v2/servers/$server_id/sshcredentials"
+    )
+
+    if [ $? -eq 0 ]; then
+        echo "Added the SSH key on the server with ID $server_id."
+    else
+        echo "Failed to add the SSH key on the server with ID $server_id."
+    fi
+}
 
 # Check if variables exist in conf.yml file
 if check_existing_variables; then
@@ -175,10 +238,12 @@ if check_existing_variables; then
     echo "variables found"
 
     # check_username_existence
-    check_username_existence
+    #check_username_existence
 
     # check if ssh key exists
 
+    # list ssh keys
+    list_ssh_keys
 
 else
     # Variables don't exist, store the variables
