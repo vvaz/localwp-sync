@@ -116,7 +116,7 @@ check_username_existence() {
     )
 
     if [ $? -eq 0 ]; then
-        exists=$(echo "$response" | jq -r --arg username "$username" '.data[] | select(.name == $username)')
+        exists=$(echo "$response" | jq -r ".data[] | select(.username == \"$username\")")
 
         if [ -n "$exists" ]; then
             echo "The username $username exists on the server with ID $server_id."
@@ -129,6 +129,13 @@ check_username_existence() {
         echo "Failed to retrieve user list from the Runcloud API."
     fi
 }
+
+
+
+
+
+
+
 
 create_username() {
     local username=$1
