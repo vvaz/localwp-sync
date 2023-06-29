@@ -22,51 +22,54 @@ check_existing_variables() {
 # Function to store variables in the conf.yml file
 store_variables() {
   # Prompt the user for input
-  options=(
-    " DEV - Development Server - Vultr"
-    " Low Traffic Websites - Vultr"
-    " Medium Sites - Vultr"
-    " Other - Enter IP"
-  )
-  PS3="Select an option (default: 1): "
+# Prompt the user for input
+options=(
+  "DEV - Development Server - Vultr"
+  "Low Traffic Websites - Vultr"
+  "Medium Sites - Vultr"
+  "Tipme Staff - Vultr"
+  "Other - Enter IP"
+)
+PS3="Select an option (default: 1): "
 
-  default_option=1
+default_option=1
 
-  select opt in "${options[@]}"
-  do
-    case $REPLY in
-      1)
-          live_server="65.20.98.212"
-          break
-          ;;
-      2)
-          live_server="65.20.99.224"
-          break
-          ;;
-      3)
-          live_server="208.85.19.209"
-          break
-          ;;
-      4)
-          read -p "Enter the IP address for the server: " live_server
-          break
-          ;;
-      *)
-          if [[ $REPLY == $default_option ]]; then
-              live_server="65.20.99.224"
-              break
-          else
-              echo "Invalid option selected. Please try again."
-          fi
-          ;;
-    esac
-  done
+# Display options with new lines
+for ((i=1; i<=${#options[@]}; i++))
+do
+  printf "%d) %s\n" "$i" "${options[$i-1]}"
+done
+
+# Read user input
+read -p "Select an option (default: 1): " selection
+selection=${selection:-$default_option}
+
+case $selection in
+  1)
+    live_server="65.20.98.212"
+    ;;
+  2)
+    live_server="65.20.99.224"
+    ;;
+  3)
+    live_server="208.85.20.59"
+    ;;
+  4)
+    live_server="208.85.19.209"
+    ;;
+  5)
+    read -p "Enter the IP address for the server: " live_server
+    ;;
+  *)
+    live_server="65.20.99.224"
+    ;;
+esac
 
    echo "server: $live_server" >> "$conf_file"
 
     # Read the variables from user input
-    read -p "What is the username? " username
-    read -p "What is the app name? " app_name
+    read -p "What is the username (either new or existing)? " username
+    read -p "What is the app name (either new or existing? " app_name
     read -p "What is the git repository? " git_repository
 
     find_server_id_by_ip
@@ -75,7 +78,6 @@ store_variables() {
     echo "app_name: $app_name" >> "$conf_file"
     echo "git_repository: $git_repository" >> "$conf_file"
     echo "server_id: $server_id" >> "$conf_file"
-
     echo "Variables stored in conf.yml file."
 }
 
@@ -103,14 +105,74 @@ find_server_id_by_ip() {
     fi
 }
 
+check_username_existence() {
+    server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
+    username=$(grep "username:" "$conf_file" | awk '{print $2}')
+
+    response=$(curl -s -X GET \
+        -u "$API_KEY:$API_SECRET" \
+        -H "Accept: application/json" \
+        "https://manage.runcloud.io/api/v2/servers/$server_id/users"
+    )
+
+    if [ $? -eq 0 ]; then
+        exists=$(echo "$response" | jq -r --arg username "$username" '.data[] | select(.name == $username)')
+
+        if [ -n "$exists" ]; then
+            echo "The username $username exists on the server with ID $server_id."
+        else
+            echo "The username $username does not exist on the server with ID $server_id."
+            # Perform the logic to create the username on the server
+            create_username "$username" "$server_id"
+        fi
+    else
+        echo "Failed to retrieve user list from the Runcloud API."
+    fi
+}
+
+create_username() {
+    local username=$1
+    local server_id=$2
+
+    # Generate a random password with 20 characters
+    password=$(LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 20)
+    echo "password: $password" >> "$conf_file"
+
+
+    # Perform the logic to create the username on the server
+    response=$(curl -s -X POST \
+        -u "$API_KEY:$API_SECRET" \
+        -H "accept: application/json" \
+        -H "content-type: application/json" \
+        --data '{
+            "username": "'"$username"'",
+            "password": "'"$password"'",
+            "shell": "/bin/rc-shell"
+        }' \
+       "https://manage.runcloud.io/api/v2/servers/$server_id/users"
+    )
+
+    if [ $? -eq 0 ]; then
+        echo "Created the username $username on the server with ID $server_id."
+        echo "Password is $password"
+    else
+        echo "Failed to create the username $username on the server with ID $server_id."
+    fi
+}
+
+
 # Check if variables exist in conf.yml file
 if check_existing_variables; then
     # Variables exist, perform necessary operations
     echo "Performing necessary operations with existing variables."
-    # Call the appropriate functions based on your requirements
-    # For example:
-    # website_server_status
-    find_server_id_by_ip
+
+    # find_server_id_by_ip
+
+    echo "variables found"
+
+    # check_username_existence
+    check_username_existence
+
 else
     # Variables don't exist, store the variables
     echo "Storing variables."
