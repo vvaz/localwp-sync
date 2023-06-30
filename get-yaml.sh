@@ -76,6 +76,7 @@ esac
     # Read the variables from user input
     read -p "What is the username (either new or existing)? " username
     read -p "What is the app name (either new or existing? " app_name
+    read -p "What is the live domain name? " live_domain
     read -p "What is the git repository? " git_repository
 
     # Grab the SSH key from ~/.ssh/id_rsa.pub
@@ -85,6 +86,7 @@ esac
     # Append the variables to the conf.yml file
     echo "username: $username" >> "$conf_file"
     echo "app_name: $app_name" >> "$conf_file"
+    echo "live_domain: $live_domain" >> "$conf_file"
     echo "git_repository: $git_repository" >> "$conf_file"
     echo "server_id: $server_id" >> "$conf_file"
     echo "ssh_key: $ssh_key" >> "$conf_file"
