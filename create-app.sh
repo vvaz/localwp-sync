@@ -47,7 +47,7 @@ create_app() {
           "https://manage.runcloud.io/api/v2/servers/$server_id/webapps/custom"
         )
 
-        echo "$response"
+        # echo "$response"
 }
 
 create_db_user() {
@@ -76,9 +76,88 @@ response=$(curl -s --request POST \
     "https://manage.runcloud.io/api/v2/servers/$server_id/databaseusers"
   )
 
+  if [ $? -eq 0 ]; then
+    db_user_id=$(echo "$response" | jq -r ' .id')
+    echo "db_user_id: $db_user_id" >> "$conf_file"
+  fi
+
 }
 
+create_db() {
+  # variables
+  server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}') # IP address of the server
+  app_name=$(grep "app_name:" "$conf_file" | awk '{print $2}') # app name
+  db_user_id=$(grep "db_user_id:" "$conf_file" | awk '{print $2}') # db user id
 
+  propper_app_name=$(echo "$app_name" | tr '-' '_')
+  ready_app_name="${propper_app_name#app_}"
+  random_number=$((RANDOM % 9001 + 1000))
+  db_name=db_"$ready_app_name"_"$random_number"
+
+  echo "db_name: $db_name" >> "$conf_file"
+
+  response=$(curl -s --request POST \
+      -u "$API_KEY:$API_SECRET" \
+      -H "Accept: application/json" \
+      -H "content-type: application/json" \
+      --data '{
+        "name": "'"$db_name"'",
+        "collation": "utf8mb4_unicode_ci",
+        "user": "'"$db_user_id"'"
+         }' \
+      "https://manage.runcloud.io/api/v2/servers/$server_id/databases"
+    )
+
+    if [ $? -eq 0 ]; then
+      db_id=$(echo "$response" | jq -r ' .id')
+      echo "db_id: $db_id" >> "$conf_file"
+    fi
+
+    # echo $response
+}
+
+add_user_to_db() {
+  # variables
+  server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}') # IP address of the server
+  app_name=$(grep "app_name:" "$conf_file" | awk '{print $2}') # app name
+  db_id=$(grep "db_id:" "$conf_file" | awk '{print $2}') # db id
+  db_user_id=$(grep "db_user_id:" "$conf_file" | awk '{print $2}') # db user id
+
+  response=$(curl -s --request POST \
+      -u "$API_KEY:$API_SECRET" \
+      -H "Accept: application/json" \
+      -H "content-type: application/json" \
+      --data '{
+        "id": "'"$db_user_id"'"
+         }' \
+      "https://manage.runcloud.io/api/v2/servers/$server_id/databases/$db_id/grant"
+    )
+
+    if [ $? -eq 0 ]; then
+      echo "Added the user to the database."
+    fi
+
+    # echo $response
+}
+
+add_github() {
+  # variables
+  server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}') # IP address of the server
+
+  response=$(curl -s --request POST \
+    -u "$API_KEY:$API_SECRET" \
+    -H "Accept: application/json" \
+    -H "content-type: application/json" \
+    --data '{
+        "provider": "github"
+        "repository": "coolcodemy/test",
+        "branch": "main"
+      }' \
+   "https://manage.runcloud.io/api/v2/servers/$server_id/webapps/109/git"
+  )
+
+  echo "$response"
+}
 
 list_apps() {
 
@@ -97,5 +176,7 @@ list_apps() {
 
 # list_apps
 # create_app
-create_db_user
+# create_db_user
 # create_db
+# add_user_to_db
+add_github
