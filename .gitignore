@@ -9,3 +9,5 @@ backups/
 *.sqlite
 .DS_STORE
 conf.yml
+_conf.yml
+_conf.yml

@@ -184,8 +184,8 @@ add_github() {
    "https://manage.runcloud.io/api/v2/servers/$server_id/webapps/$app_id/git"
   )
 
-   echo "$response"
-   # echo "Added the github repository to the app."
+   # echo "$response"
+   echo "Added the github repository to the app."
 }
 
 add_deploy_key(){
@@ -205,7 +205,7 @@ response=$(curl -L -X POST \
   "https://api.github.com/repos/$git_owner/$git_repo/keys"
   )
 
-  echo "$response"
+ # echo "$response"
 }
 
 add_webhook() {
@@ -225,7 +225,7 @@ add_webhook() {
 
 
 
- echo "$response"
+# echo "$response"
 
 
 }
@@ -242,27 +242,20 @@ list_apps() {
           "https://manage.runcloud.io/api/v2/servers/$server_id/webapps/"
         )
 
-        echo "$response"
+        # echo "$response"
 }
 
 # list_apps
 create_app
-sleep 1
 
 create_db_user
-sleep 1
 
 create_db
-sleep 1
-
-add_user_to_db
-sleep 1
 
 add_deploy_key
-sleep 1
+
+add_user_to_db
 
 add_github
-sleep 1
 
 add_webhook
-sleep 1
