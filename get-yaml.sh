@@ -74,10 +74,13 @@ esac
    echo "server: $live_server" >> "$conf_file"
 
     # Read the variables from user input
-    read -p "What is the username (either new or existing)? " username
-    read -p "What is the app name (either new or existing? " app_name
-    read -p "What is the live domain name? " live_domain
-    read -p "What is the git repository? " git_repository
+    read -p "username (either new or existing)? " username
+    read -p "app name (either new or existing? " app_name
+    read -p "Live domain name? " live_domain
+    # read -p "What is the git repository? " git_repository
+    read -p "Git owner? " git_owner
+    read -p "Git repository? " git_repository
+
 
     # Grab the SSH key from ~/.ssh/id_rsa.pub
     ssh_key=$(cat ~/.ssh/id_ed25519.pub)
@@ -87,6 +90,8 @@ esac
     echo "username: $username" >> "$conf_file"
     echo "app_name: $app_name" >> "$conf_file"
     echo "live_domain: $live_domain" >> "$conf_file"
+    # echo "git_repository: $git_repository" >> "$conf_file"
+    echo "git_owner: $git_owner" >> "$conf_file"
     echo "git_repository: $git_repository" >> "$conf_file"
     echo "server_id: $server_id" >> "$conf_file"
     echo "ssh_key: $ssh_key" >> "$conf_file"
