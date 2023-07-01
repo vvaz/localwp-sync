@@ -202,11 +202,6 @@ response=$(curl -L -X POST \
   -d '{"title":"deploy@runcloud","key":"'"$git_deployment_key"'","read_only":false}' \
   "https://api.github.com/repos/$git_owner/$git_repo/keys"
   )
-
-  echo "$git_deployment_key"
-
-  echo "$response"
-
 }
 
 list_apps() {
@@ -229,5 +224,6 @@ list_apps() {
 # create_db_user
 # create_db
 # add_user_to_db
-add_deploy_key
+# add_deploy_key
 # add_github
+# add_webhook
