@@ -1,7 +1,38 @@
 #!/bin/bash
 
+conf_file="conf.yml"
 WPPath=--path=public/
 current_folder=$(basename "$PWD")
+
+ddevSetup () {
+  # ddev setup
+  echo "Setting up DDEV..."
+  ddev config --project-name=$current_folder --docroot=public --create-docroot --project-type=wordpress --php-version=7.4
+  echo "Done!"
+}
+
+
+cloneRepo () {
+  git_owner=$(grep "git_owner:" "$conf_file" | awk '{print $2}') # github owner
+  git_repo=$(grep "git_repo:" "$conf_file" | awk '{print $2}') # git repository
+  gitRepo=git@github.com:$git_owner/$git_repo.git
+
+  # clone repo
+  echo "Cloning the repository..."
+  git clone $gitRepo public
+  echo "Done!"
+
+  # move wp-config.php to root
+  echo "creating wp-config from DDEV..."
+  mv public-old/wp-config.php public/wp-config.php
+  mv public-old/wp-config-ddev.php public/wp-config-ddev.php
+  echo "Done!"
+
+  # clear public-old
+  echo "Clear public-old..."
+  rm -rf public-old
+  echo "Done!"
+}
 
 # check if there is a public-old folder
 if ! [ -d "public-old" ]; then
@@ -16,13 +47,6 @@ if ! [ -d "backups" ]; then
   echo "DONE"
 fi
 
-ddevSetup () {
-  # ddev setup
-  echo "Setting up DDEV..."
-  ddev config --project-name=$current_folder --docroot=public --create-docroot --project-type=wordpress --php-version=7.4
-  echo "Done!"
-}
-
 # check if there is a .ddev folder
 if ! [ -d ".ddev" ]; then
   echo "No .ddev folder found, setting up DDEV..."
@@ -30,78 +54,12 @@ if ! [ -d ".ddev" ]; then
 fi
 
 # Prompt the user for questions and store answers in variables
-read -p "Enter your name: " name
-read -p "Enter your age: " age
-read -p "Enter your favorite color: " color
-
+# read -p "Enter your name: " name
 # Create a conf YAML file
-cat <<EOF >conf.yaml
-name: $name
-age: $age
-color: $color
-EOF
+# cat <<EOF >conf.yml
+# name: $name
+#EOF
 
-
-
-<<datfile
-if ! [ -e "variables.dat" ]; then
-  echo "variables.dat file not found, creating one..."
-  # getting variables
-  echo "=================================="
-  echo "==            DDEV              =="
-  echo "=================================="
-  echo "What is your site name on DDEV?"
-  read siteName
-  echo "siteName=$siteName" > variables.dat
-  # echo "What is your db port on LOCAL"
-  # read dbport
-  # echo "dbport=$dbport" >> variables.dat
-  echo "=================================="
-  echo "==      LIVE / Runcloud         =="
-  echo "=================================="
-  echo "What is the IP of the LIVE server?"
-  read ipRuncloud
-  echo "ipRuncloud=$ipRuncloud" >> variables.dat
-  echo "What is the your RunCloud username?"
-  read usernameRuncloud
-  echo "usernameRuncloud=$usernameRuncloud" >> variables.dat
-  echo "What is your app-name on RunCloud?"
-  read runcloudAppName
-  echo "runcloudAppName=$runcloudAppName" >> variables.dat
-  echo "What is your Runcloud domain"
-  read runcloudDomain
-  echo "runcloudDomain=$runcloudDomain" >> variables.dat
-  echo "Github repository (git@url):"
-  read gitRepo
-  echo "gitRepo=$gitRepo" >> variables.dat
-fi
-datfile
-
-<<datfile
-# read variables from the .dat file
-  while read line; do
-    declare $line
-    echo $line
-  done < variables.dat
-datfile
-
-<<test
-echo "Cloning the repository..."
-git clone $gitRepo public
-echo "Done!"
-
-# move wp-config.php to root
-echo "creating wp-config from DDEV..."
-mv public-old/wp-config.php public/wp-config.php
-mv public-old/wp-config-ddev.php public/wp-config-ddev.php
-echo "Done!"
-
-# clear public-old
-echo "Clear public-old..."
-rm -rf public-old
-echo "Done!"
-test
-
-
+cloneRepo
 
 exit 0
