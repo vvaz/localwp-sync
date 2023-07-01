@@ -56,7 +56,7 @@ create_app() {
       echo "pullKey1: $pullKey1" >> "$conf_file"
       echo "pullKey2: $pullKey2" >> "$conf_file"
     fi
-
+    # echo "$response"
     echo "Created app: $app_name"
 }
 
@@ -158,27 +158,29 @@ add_github() {
   # variables
   server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}') # IP address of the server
   app_id=$(grep "app_id:" "$conf_file" | awk '{print $2}') # app id
-  git_repository=$(grep "git_repository:" "$conf_file" | awk '{print $2}') # git repository
+  #git_repository=$(grep "git_repository:" "$conf_file" | awk '{print $2}') # git repository
   pullKey1=$(grep "pullKey1:" "$conf_file" | awk '{print $2}') # pull key 1
   pullKey2=$(grep "pullKey2:" "$conf_file" | awk '{print $2}') # pull key 2
+
+  git_owner=$(grep "git_owner:" "$conf_file" | awk '{print $2}') # github owner
+  git_repo=$(grep "git_repository:" "$conf_file" | awk '{print $2}') # git repository
+
   # Remove "git@github.com:"
-  removed_prefix="${git_repository#git@github.com:}"
-
+  #removed_prefix="${git_repository#git@github.com:}"6
   # Remove ".git"
-  removed_suffix="${removed_prefix%.git}"
-
-  git_name=$removed_suffix
+  #removed_suffix="${removed_prefix%.git}"
+  #git_name=$removed_suffix
 
 
   response=$(curl -s --request POST \
     -u "$API_KEY:$API_SECRET" \
     -H "Accept: application/json" \
     -H "content-type: application/json" \
-    --data '{
-        "provider": "github",
-        "repository": "'"$git_name"'",
-        "branch": "main"
-      }' \
+    --data "{
+        \"provider\": \"github\",
+        \"repository\": \"$git_owner/$git_repo\",
+        \"branch\": \"main\"
+      }" \
    "https://manage.runcloud.io/api/v2/servers/$server_id/webapps/$app_id/git"
   )
 
@@ -189,9 +191,9 @@ add_github() {
 add_deploy_key(){
   # add deploy key to github
   # variables
-  github_token=$(grep "github_token:" "$conf_file" | awk '{print $2}') # IP address of the server
-  git_owner=$(grep "git_owner:" "$conf_file" | awk '{print $2}') # app id
-  git_repo=$(grep "git_repo:" "$conf_file" | awk '{print $2}') # git repository
+  github_token=$(grep "github_token:" "$conf_file" | awk '{print $2}') # github token
+  git_owner=$(grep "git_owner:" "$conf_file" | awk '{print $2}') # github owner
+  git_repo=$(grep "git_repository:" "$conf_file" | awk '{print $2}') # git repository
   # load string with spaces
   git_deployment_key=$(grep "git_deployment_key:" "$conf_file" | cut -d' ' -f2-)
 
@@ -202,6 +204,30 @@ response=$(curl -L -X POST \
   -d '{"title":"deploy@runcloud","key":"'"$git_deployment_key"'","read_only":false}' \
   "https://api.github.com/repos/$git_owner/$git_repo/keys"
   )
+
+  echo "$response"
+}
+
+add_webhook() {
+  github_token=$(grep "github_token:" "$conf_file" | awk '{print $2}') # github token
+  git_owner=$(grep "git_owner:" "$conf_file" | awk '{print $2}') # github owner
+  git_repo=$(grep "git_repository:" "$conf_file" | awk '{print $2}') # git repository
+  pullKey1=$(grep "pullKey1:" "$conf_file" | awk '{print $2}') # pull key 1
+  pullKey2=$(grep "pullKey2:" "$conf_file" | awk '{print $2}') # pull key 2
+
+  response=$(curl -L -X POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer $github_token"\
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  -d "{\"name\":\"web\",\"active\":true,\"events\":[\"push\",\"pull_request\"],\"config\":{\"url\":\"https://manage.runcloud.io/webhooks/git/$pullKey1/$pullKey2\",\"content_type\":\"json\",\"insecure_ssl\":\"0\"}}" \
+  "https://api.github.com/repos/$git_owner/$git_repo/hooks"
+  )
+
+
+
+ echo "$response"
+
+
 }
 
 list_apps() {
@@ -220,10 +246,23 @@ list_apps() {
 }
 
 # list_apps
-# create_app
-# create_db_user
-# create_db
-# add_user_to_db
-# add_deploy_key
-# add_github
-# add_webhook
+create_app
+sleep 1
+
+create_db_user
+sleep 1
+
+create_db
+sleep 1
+
+add_user_to_db
+sleep 1
+
+add_deploy_key
+sleep 1
+
+add_github
+sleep 1
+
+add_webhook
+sleep 1
