@@ -100,6 +100,8 @@ find_server_id_by_ip() {
         "https://manage.runcloud.io/api/v2/servers"
     )
 
+    # echo "$response"
+
     if [ $? -eq 0 ]; then
         server_id=$(echo "$response" | jq -r --arg ip "$ip_address" '.data[] | select(.ipAddress == $ip) | .id')
 
@@ -115,8 +117,9 @@ find_server_id_by_ip() {
 }
 
 check_if_app_exists() {
-  server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}') # server ID
-  app_name=$(grep "app_name:" "$conf_file" | awk '{print $2}') # server ID
+  # get variables
+  server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
+  app_name=$(grep "app_name:" "$conf_file" | awk '{print $2}')
 
   response=$(curl -s -X GET \
         -u "$RUNCLOUD_API_KEY:$RUNCLOUD_API_SECRET" \
@@ -127,19 +130,7 @@ check_if_app_exists() {
   app_name_exists=$(echo "$response" | jq --arg app_name "$app_name" '.data[] | select(.name == $app_name) | .name')
 
   if [[ -n $app_name_exists ]]; then
-    matching_object=$(echo "$response" | jq --arg app_name "$app_name" '.data[] | select(.name == $app_name)')
-
-    # Check if a matching object was found. If not, exit or handle as needed.
-    if [[ -z $matching_object ]]; then
-        echo "No matching object found!"
-        exit 1
-    fi
-
-    # Extract and save each key-value pair to the conf.yml file
-    for key in $(echo "$matching_object" | jq -r 'keys[]'); do
-        value=$(echo "$matching_object" | jq -r --arg key "$key" '.[$key]')
-        echo "$key: $value" >> conf.yml
-    done
+    ./ops/runcloud-to-local/get-app.sh
   else
     # Read the variables from user input
     read -p "username (either new or existing)? " username
