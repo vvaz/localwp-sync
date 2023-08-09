@@ -5,19 +5,10 @@ conf_file="conf.yml"
 RUNCLOUD_API_KEY=$(grep "runcloudApiKey:" "$conf_file" | awk '{print $2}')
 RUNCLOUD_API_SECRET=$(grep "runcloudApiSecret:" "$conf_file" | awk '{print $2}')
 
+
 # add OS to conf.yml
 check_os() {
-  existing_variables=$(grep -E "^(os):" "$conf_file")
-  if [ -n "$existing_variables" ]; then
-    echo "> OS is already added to conf.yml file"
-  else
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-      OS="m1"
-    else
-        OS="w11"
-    fi
-    echo "os: $OS" >> "$conf_file"
-  fi
+  ./inc/check_os.sh
 }
 
 # Function to check if variables exist in the conf.yml file
