@@ -4,11 +4,11 @@
 conf_file="conf.yml"
 RUNCLOUD_API_KEY=$(grep "runcloudApiKey:" "$conf_file" | awk '{print $2}')
 RUNCLOUD_API_SECRET=$(grep "runcloudApiSecret:" "$conf_file" | awk '{print $2}')
-
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # add OS to conf.yml
 check_os() {
-  ./inc/check_os.sh
+  $DIR/inc/check_os.sh
 }
 
 # Function to check if variables exist in the conf.yml file
