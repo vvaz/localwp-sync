@@ -131,6 +131,7 @@ check_if_app_exists() {
 
   if [[ -n $app_name_exists ]]; then
     ./ops/runcloud-to-local/get-app.sh
+    get_git_info
   else
     # Read the variables from user input
     read -p "username (either new or existing)? " username
@@ -151,11 +152,17 @@ check_if_app_exists() {
   fi
 }
 
+get_git_info() {
+  echo "get git"
+  ./ops/runcloud-to-local/get-git.sh
+}
 
 # run the functions
 
 # check operating system
 check_os
+
+# get_git_info
 
 # check if variables exist in the conf.yml file
 check_existing_variables
