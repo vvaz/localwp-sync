@@ -1,0 +1,25 @@
+#!/bin/bash
+conf_file="conf.yml"
+
+ip_address=$(grep "server:" "$conf_file" | awk '{print $2}') # IP address of the server
+
+response=$(curl -s -X GET \
+    -u "$RUNCLOUD_API_KEY:$RUNCLOUD_API_SECRET" \
+    -H "Accept: application/json" \
+    "https://manage.runcloud.io/api/v2/servers"
+)
+
+# echo "$response"
+
+if [ $? -eq 0 ]; then
+    server_id=$(echo "$response" | jq -r --arg ip "$ip_address" '.data[] | select(.ipAddress == $ip) | .id')
+
+    if [ -n "$server_id" ]; then
+        # echo "Server ID for IP $ip_address: $server_id"
+        echo "server_id: $server_id" >> "$conf_file"
+    else
+        echo "No server found with IP $ip_address."
+    fi
+else
+    echo "Failed to retrieve server list from the Runcloud API."
+fi
