@@ -1,36 +1,54 @@
 #!/bin/bash
 
 # Read API_KEY and API_SECRET from conf.yml file
-conf_file="conf.yml"
-RUNCLOUD_API_KEY=$(grep "runcloudApiKey:" "$conf_file" | awk '{print $2}')
-RUNCLOUD_API_SECRET=$(grep "runcloudApiSecret:" "$conf_file" | awk '{print $2}')
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DIR="$(pwd)"
+DIR_OPS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+conf_file=$DIR/conf.yml
+
+printf "\n"
+printf "+---------------------+\n"
+printf "| Saving base DIRS... |\n"
+printf "+---------------------+\n"
+printf "\n"
+
+# check if DIR and DIR_OPS are already in the conf.yml file
+existing_variables=$(grep -E "^(DIR|DIR_OPS):" "$conf_file")
+if [ -n "$existing_variables" ]; then
+  echo "DIR and DIR_OPS are already stored on the conf.yml"
+else
+  echo "DIR: $DIR" >> "$conf_file"
+  echo "DIR_OPS: $DIR_OPS" >> "$conf_file"
+  echo "DIR and DIR_OPS were stored in conf.yml"
+fi
+
 
 # ensure everyfile have execute permission
-chmod +x $DIR/inc/*.sh
+chmod +x $DIR_OPS/inc/*.sh
+
+# clear
 
 # add OS to conf.yml
 check_os() {
-  $DIR/inc/check_os.sh
+  $DIR_OPS/inc/check_os.sh
 }
 
 # Function to check if variables exist in the conf.yml file
 check_existing_variables() {
-  $DIR/inc/check_existing_variables.sh
+  $DIR_OPS/inc/check_existing_variables.sh
 }
 
 # Function to store variables in the conf.yml file
 store_variables() {
-  $DIR/inc/store_variables.sh
+  $DIR_OPS/inc/store_variables.sh
 }
 
 # Function to find server ID by IP
 find_server_id_by_ip() {
-  $DIR/inc/find_server_id_by_ip.sh
+  $DIR_OPS/inc/find_server_id_by_ip.sh
 }
 
 check_if_app_exists() {
-
+  $DIR_OPS/inc/check_if_app_exists.sh
 }
 
 get_git_info() {

@@ -1,10 +1,15 @@
 #!/bin/bash
-conf_file="conf.yml"
+# load base variables
+DIR="$(pwd)"
+conf_file=$DIR/conf.yml
 
+# load variables
 
-# get variables
+RUNCLOUD_API_KEY=$(grep "api_key:" "$conf_file" | awk '{print $2}')
+RUNCLOUD_API_SECRET=$(grep "api_secret:" "$conf_file" | awk '{print $2}')
 server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
 app_name=$(grep "app_name:" "$conf_file" | awk '{print $2}')
+DIR_OPS=$(grep "DIR_OPS:" "$conf_file" | awk '{print $2}')
 
 response=$(curl -s -X GET \
       -u "$RUNCLOUD_API_KEY:$RUNCLOUD_API_SECRET" \
@@ -15,7 +20,7 @@ response=$(curl -s -X GET \
 app_name_exists=$(echo "$response" | jq --arg app_name "$app_name" '.data[] | select(.name == $app_name) | .name')
 
 if [[ -n $app_name_exists ]]; then
-  ./ops/runcloud-to-local/get-app.sh
+  $DIR_OPS/runcloud-to-local/get-app.sh
   get_git_info
 else
   # Read the variables from user input

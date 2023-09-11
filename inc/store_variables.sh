@@ -1,5 +1,20 @@
 #!/bin/bash
-conf_file="conf.yml"
+
+# load base variables
+DIR="$(pwd)"
+conf_file=$DIR/conf.yml
+
+# load variables
+DIR_OPS=$(grep "DIR_OPS:" "$conf_file" | awk '{print $2}')
+
+# functions
+find_server_id_by_ip() {
+  $DIR_OPS/inc/find_server_id_by_ip.sh
+}
+
+check_if_app_exists() {
+  $DIR_OPS/inc/check_if_app_exists.sh
+}
 
 # Prompt the user for input
   options=(

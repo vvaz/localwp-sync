@@ -1,8 +1,20 @@
 #!/bin/bash
-conf_file="conf.yml"
 
-clear
-echo "Checking OS..."
+# load base variables
+DIR="$(pwd)"
+conf_file=$DIR/conf.yml
+
+
+
+# load variables necessary to run on this script
+
+printf "\n"
+printf "+----------------+\n"
+printf "| Checking OS... |\n"
+printf "+----------------+\n"
+printf "\n"
+
+# check if OS is already added to conf.yml file
 
 existing_variables=$(grep -E "^(os):" "$conf_file")
   if [ -n "$existing_variables" ]; then
@@ -17,4 +29,4 @@ existing_variables=$(grep -E "^(os):" "$conf_file")
     echo "OS stored in conf.yml"
   fi
 
-echo ""
+printf "\n"
