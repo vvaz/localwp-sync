@@ -8,12 +8,12 @@ conf_file=$DIR/conf.yml
 DIR_OPS=$(grep "DIR_OPS:" "$conf_file" | awk '{print $2}')
 
 # functions
-find_server_id_by_ip() {
-  $DIR_OPS/inc/find_server_id_by_ip.sh
+check_server_id_by_ip() {
+  $DIR_OPS/inc/check-server_id_by_ip.sh
 }
 
 check_if_app_exists() {
-  $DIR_OPS/inc/check_if_app_exists.sh
+  $DIR_OPS/inc/check-if_app_exists.sh
 }
 
 # Prompt the user for input
@@ -61,7 +61,7 @@ check_if_app_exists() {
 
   echo "server: $live_server" >> "$conf_file"
 
-  find_server_id_by_ip
+  check_server_id_by_ip
 
   read -p "app name (either new or existing)? " app_name
   echo "app_name: $app_name" >> "$conf_file"

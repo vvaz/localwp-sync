@@ -29,39 +29,18 @@ chmod +x $DIR_OPS/inc/*.sh
 
 # add OS to conf.yml
 check_os() {
-  $DIR_OPS/inc/check_os.sh
+  $DIR_OPS/inc/check-os.sh
 }
 
 # Function to check if variables exist in the conf.yml file
 check_existing_variables() {
-  $DIR_OPS/inc/check_existing_variables.sh
-}
-
-# Function to store variables in the conf.yml file
-store_variables() {
-  $DIR_OPS/inc/store_variables.sh
-}
-
-# Function to find server ID by IP
-find_server_id_by_ip() {
-  $DIR_OPS/inc/find_server_id_by_ip.sh
-}
-
-check_if_app_exists() {
-  $DIR_OPS/inc/check_if_app_exists.sh
-}
-
-get_git_info() {
-  echo "get git"
-  ./ops/runcloud-to-local/get-git.sh
+  $DIR_OPS/inc/check-existing_variables.sh
 }
 
 # run the functions
 
 # check operating system
 check_os
-
-# get_git_info
 
 # check if variables exist in the conf.yml file
 check_existing_variables

@@ -10,7 +10,7 @@ DIR_OPS=$(grep "DIR_OPS:" "$conf_file" | awk '{print $2}')
 
 # functions
 store_variables() {
-  $DIR_OPS/inc/store_variables.sh
+  $DIR_OPS/inc/store-variables.sh
 }
 
 return_existing_variables() {
