@@ -12,7 +12,7 @@ server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
 app_name=$(grep "app_name:" "$conf_file" | awk '{print $2}')
 live_domain=$(grep "live_domain:" "$conf_file" | awk '{print $2}')
 git_repository=$(grep "git_repository:" "$conf_file" | awk '{print $2}')
-user_id=$(grep "user_id:" "$conf_file" | awk '{print $2}')
+user_id=$(grep "^user_id:" "$conf_file" | awk '{print $2}')
 username=$(grep "username:" "$conf_file" | awk '{print $2}')
 DIR_OPS=$DIR/ops
 
@@ -59,5 +59,5 @@ DIR_OPS=$DIR/ops
       echo "pullKey1: $pullKey1" >> "$conf_file"
       echo "pullKey2: $pullKey2" >> "$conf_file"
     fi
-    # echo "$response"
+
     echo "Created app: $app_name"

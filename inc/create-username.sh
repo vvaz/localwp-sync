@@ -41,6 +41,7 @@ response=$(curl -s -X POST \
     "https://manage.runcloud.io/api/v2/servers/$server_id/users"
 )
 
+
 if [ $? -eq 0 ]; then
   user_id=$(echo "$response" | jq -r '.id')
   echo "Created the username $username on the server with ID $server_id."
@@ -49,7 +50,7 @@ if [ $? -eq 0 ]; then
 
   echo "Generating the deployment key..."
   create_deploy_key
-  add_deploy_key_github
+  # add_deploy_key_github
 else
   echo "Failed to create the username $username on the server with ID $server_id."
 fi

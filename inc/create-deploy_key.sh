@@ -9,18 +9,17 @@ conf_file=$DIR/conf.yml
 RUNCLOUD_API_KEY=$(grep "api_key:" "$conf_file" | awk '{print $2}')
 RUNCLOUD_API_SECRET=$(grep "api_secret:" "$conf_file" | awk '{print $2}')
 server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
-user_id=$(grep "user_id:" "$conf_file" | awk '{print $2}')
+user_id=$(grep "^user_id:" "$conf_file" | awk '{print $2}')
 
 # Perform the logic to generate the deployment key on the server
+
+
 response=$(curl --request PATCH \
-      -u "$RUNCLOUD_API_KEY:$RUNCLOUD_API_SECRET" \
-      --header "accept: application/json" \
-      --header "content-type: application/json" \
-      --url "https://manage.runcloud.io/api/v2/servers/$server_id/users/$user_id/deploymentkey"
-  )
+  --url "https://manage.runcloud.io/api/v2/servers/$server_id/users/$user_id/deploymentkey" \
+  -u "$RUNCLOUD_API_KEY:$RUNCLOUD_API_SECRET" \
+  --header "accept: application/json" \
+  --header "content-type: application/json")
 
-
-  echo $response
 
 if [ $? -eq 0 ]; then
     git_deployment_key=$(echo "$response" | jq -r ' .deploymentKey')
