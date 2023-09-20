@@ -15,3 +15,7 @@ response=$(curl -s --request GET \
   -H "content-type: application/json" \
     "https://manage.runcloud.io/api/v2/servers/$server_id/webapps/"
   )
+
+
+# debug
+echo "$response" | jq -r '.data[] | "\(.id) \(.name)"' | column -t

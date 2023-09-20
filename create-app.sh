@@ -74,11 +74,10 @@ list_apps() {
 
 check_username
 
-list_apps
-create_app
-create_db_user
-create_db
-add_deploy_key
-add_github
-add_webhook
-add_user_to_db
+# create_app
+# create_db_user
+# create_db
+# add_deploy_key
+# add_github
+# add_webhook
+# add_user_to_db

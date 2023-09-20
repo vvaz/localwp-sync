@@ -61,3 +61,6 @@ DIR_OPS=$DIR/ops
     fi
 
     echo "Created app: $app_name"
+
+    # debug
+    echo "$response" | jq -r '.'
