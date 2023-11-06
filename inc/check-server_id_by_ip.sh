@@ -16,8 +16,6 @@ response=$(curl -s -X GET \
     "https://manage.runcloud.io/api/v2/servers"
 )
 
-echo "$response"
-
 if [ $? -eq 0 ]; then
     server_id=$(echo "$response" | jq -r --arg ip "$ip_address" '.data[] | select(.ipAddress == $ip) | .id')
 

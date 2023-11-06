@@ -6,8 +6,8 @@ conf_file=$DIR/conf.yml
 
 # load variables
 
-RUNCLOUD_API_KEY=$(grep "api_key:" "$conf_file" | awk '{print $2}')
-RUNCLOUD_API_SECRET=$(grep "api_secret:" "$conf_file" | awk '{print $2}')
+RUNCLOUD_API_KEY=$(grep "runcloudApiKey:" "$conf_file" | awk '{print $2}')
+RUNCLOUD_API_SECRET=$(grep "runcloudApiSecret:" "$conf_file" | awk '{print $2}')
 server_id=$(grep "server_id:" "$conf_file" | awk '{print $2}')
 username=$(grep "username:" "$conf_file" | awk '{print $2}')
 DIR_OPS=$(grep "DIR_OPS:" "$conf_file" | awk '{print $2}')
