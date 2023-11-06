@@ -6,8 +6,8 @@ conf_file=$DIR/conf.yml
 
 # load variables
 ip_address=$(grep "server:" "$conf_file" | awk '{print $2}')
-RUNCLOUD_API_KEY=$(grep "api_key:" "$conf_file" | awk '{print $2}')
-RUNCLOUD_API_SECRET=$(grep "api_secret:" "$conf_file" | awk '{print $2}')
+RUNCLOUD_API_KEY=$(grep "runcloudApiKey:" "$conf_file" | awk '{print $2}')
+RUNCLOUD_API_SECRET=$(grep "runcloudApiSecret:" "$conf_file" | awk '{print $2}')
 
 
 response=$(curl -s -X GET \
@@ -15,6 +15,8 @@ response=$(curl -s -X GET \
     -H "Accept: application/json" \
     "https://manage.runcloud.io/api/v2/servers"
 )
+
+echo "$response"
 
 if [ $? -eq 0 ]; then
     server_id=$(echo "$response" | jq -r --arg ip "$ip_address" '.data[] | select(.ipAddress == $ip) | .id')
