@@ -20,8 +20,26 @@ response=$(curl -s -X GET \
 app_name_exists=$(echo "$response" | jq --arg app_name "$app_name" '.data[] | select(.name == $app_name) | .name')
 
 if [[ -n $app_name_exists ]]; then
-  $DIR_OPS/runcloud-to-local/get-app.sh
-  get_git_info
+  # $DIR_OPS/runcloud-to-local/get-app.sh
+  # get_git_info
+
+  # Read the variables from user input
+  read -p "username (either new or existing)? " username
+  read -p "Live domain name? " live_domain
+  read -p "Git owner? " git_owner
+  read -p "Git repository? " git_repository
+
+  # Grab the SSH key from ~/.ssh/id_rsa.pub
+  ssh_key=$(cat ~/.ssh/id_ed25519.pub)
+
+  # Append the variables to the conf.yml file
+  echo "username: $username" >> "$conf_file"
+  echo "live_domain: $live_domain" >> "$conf_file"
+  echo "git_owner: $git_owner" >> "$conf_file"
+  echo "git_repository: $git_repository" >> "$conf_file"
+  echo "ssh_key: $ssh_key" >> "$conf_file"
+  echo "Variables stored in conf.yml file."
+
 else
   # Read the variables from user input
   read -p "username (either new or existing)? " username

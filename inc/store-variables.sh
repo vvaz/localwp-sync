@@ -22,6 +22,7 @@ check_if_app_exists() {
     "Low Traffic Websites - Vultr"
     "Medium Sites - Vultr"
     "Tipme Staff - Vultr"
+    "Streamer Shops - Azure"
     "Other - Enter IP"
   )
   PS3="Select an option (default: 1): "
@@ -52,6 +53,9 @@ check_if_app_exists() {
       live_server="208.85.19.209"
       ;;
     5)
+      live_server="20.199.85.65"
+      ;;
+    6)
       read -p "Enter the IP address for the server: " live_server
       ;;
     *)
